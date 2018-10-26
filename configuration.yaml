@@ -13,6 +13,9 @@ homeassistant:
   # Customization file
   customize: !include customize.yaml
 
+logger:
+  default: info
+
 # Show links to resources in log and frontend
 introduction:
 
@@ -88,13 +91,25 @@ sensor:
         friendly_name: "CPU Used %"
         unit_of_measurement: '%'
         value_template: "{{states.sensor.processor_use.state | multiply(0.5) | round | multiply(2)}}"
+      uptime_v2:
+        friendly_name: Uptime
+        unit_of_measurement: days
+        value_template: '{% set uptime_num = states.sensor.uptime.state|float %}
+                         {% if uptime_num <=1 -%}
+                         {{uptime_num  | round(1)}}
+                         {%- else -%}
+                         {{uptime_num  | round}}
+                         {%- endif %}'
+
+        
+        
 
 # Text to speech
 tts:
   - platform: google
 
 # Cloud
-cloud:
+# cloud:
 
 group: !include groups.yaml
 automation: !include automations.yaml
@@ -112,8 +127,13 @@ switch:
     name: Sofa Lamp
     
 eufy:
-  username: !secret eufy_username
-  password: !secret eufy_password
+  # username: !secret eufy_username
+  # password: !secret eufy_password
+  devices:
+    - address: 192.168.29.198
+      access_token: !secret eufy_bulb_access_token
+      type: T1012
+      name: Lumos Tunable Smart Bulb
 
 recorder:  
   db_url: !secret db_url
@@ -128,6 +148,7 @@ recorder:
       - sensor.cpu_temperature
       - sensor.memory_use_percent
       - sensor.processor_use
+      - sensor.uptime
     domains:
       - media_player
 
