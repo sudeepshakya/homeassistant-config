@@ -1,0 +1,68 @@
+- action:
+  - data:
+      entity_id: switch.living_room_switch
+    service: switch.turn_on
+  - data:
+      entity_id: switch.sofa_lamp
+    service: switch.turn_on
+  alias: 'Lights on at sunset '
+  condition: []
+  id: '1515973686172'
+  trigger:
+  - event: sunset
+    platform: sun
+  - at: '19:00'
+    platform: time
+- action:
+  - data:
+      entity_id: switch.living_room_switch
+    service: switch.turn_off
+  - data:
+      entity_id: switch.sofa_lamp
+    service: switch.turn_off
+  - data:
+      entity_id: light.night_lamp
+    service: light.turn_off
+  alias: Turn off all the lights
+  condition: []
+  id: '1515973892560'
+  trigger:
+  - at: '22:30'
+    platform: time
+  - at: 00:00
+    platform: time
+- action:
+  - alias: ''
+    data:
+      entity_id: light.night_lamp
+    service: light.turn_off
+  alias: Timer to Turn off night lamp at night
+  condition:
+  - after: '20:30'
+    before: '6:00'
+    condition: time
+  id: '1515980066369'
+  trigger:
+  - entity_id: light.night_lamp
+    from: 'off'
+    platform: state
+    to: 'on'
+    for:
+      minutes: '15'
+- id: '1532999623101'
+  alias: Dim Bedroom Light at night
+  trigger:
+  - entity_id: light.night_lamp
+    from: 'off'
+    platform: state
+    to: 'on'
+  condition:
+  - after: sunrise
+    before: sunset
+    condition: sun
+  action:
+  - data:
+      brightness: '250'
+      color_temp: '370'
+      entity_id: light.night_lamp
+    service: light.turn_on
