@@ -13,50 +13,15 @@ homeassistant:
   # Customization file
   customize: !include customize.yaml
 
-logger:
-  default: info
-
-# Show links to resources in log and frontend
-introduction:
-
-# Enables the frontend
-frontend:
-
-# Enables configuration UI
-config:
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
 
 # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
 http:
   base_url: !secret base_url
-  ssl_certificate: /ssl/fullchain.pem
-  ssl_key: /ssl/privkey.pem
-
-# Checks for available updates
-# Note: This component will send some information about your system to
-# the developers to assist with development of Home Assistant.
-# For more information, please see:
-# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
-updater:
-  # Optional, allows Home Assistant developers to focus on popular components.
-  # include_used_components: true
 
 # Discover some devices automatically
 discovery:
-
-# Allows you to issue voice commands from the frontend in enabled browsers
-conversation:
-
-# Enables support for tracking state changes over time
-history:
-
-# View all events in a logbook
-logbook:
-
-# Enables a map showing the location of tracked devices
-map:
-
-# Track the sun
-sun:
 
 sensor:
   - platform: systemmonitor
@@ -72,9 +37,6 @@ sensor:
       - type: last_boot
       # - type: since_last_boot
   - platform: uptime
-    name: Uptime
-    unit_of_measurement: days
-    value_template: '{{ value | round(1)}}'
   - platform: command_line
     name: CPU Temperature
     command: "cat /sys/class/thermal/thermal_zone0/temp"
@@ -92,7 +54,7 @@ sensor:
         unit_of_measurement: '%'
         value_template: "{{states.sensor.processor_use.state | multiply(0.5) | round | multiply(2)}}"
       uptime_v2:
-        friendly_name: Uptime
+        friendly_name: Uptime (days)
         unit_of_measurement: days
         value_template: '{% set uptime_num = states.sensor.uptime.state|float %}
                          {% if uptime_num <=1 -%}
@@ -101,39 +63,29 @@ sensor:
                          {{uptime_num  | round}}
                          {%- endif %}'
 
-        
-        
-
 # Text to speech
 tts:
-  - platform: google
-
-# Cloud
-# cloud:
+  - platform: google_translate
 
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 
-switch:
-  - platform: tplink
-    host: 192.168.29.134
-    name: Guest Room Light
-  - platform: tplink
-    host: 192.168.29.170
-    name: Living Room Switch
-  - platform: tplink
-    host: 192.168.29.200
-    name: Sofa Lamp
+tplink:
+  discovery: false
+  switch:
+    - host: 192.168.29.134
+    - host: 192.168.29.170
+    - host: 192.168.29.200
     
 eufy:
   # username: !secret eufy_username
   # password: !secret eufy_password
   devices:
-    - address: 192.168.29.198
+    - address: 192.168.29.194
       access_token: !secret eufy_bulb_access_token
       type: T1012
-      name: Lumos Tunable Smart Bulb
+      name: Night Lamp
 
 recorder:  
   db_url: !secret db_url
@@ -151,4 +103,3 @@ recorder:
       - sensor.uptime
     domains:
       - media_player
-
